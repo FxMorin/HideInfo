@@ -1,0 +1,10 @@
+name: HideInfo
+version: '${project.version}'
+main: ca.fxco.hideinfo.HideInfo
+api-version: 1.17
+
+commands:
+  hideinfo:
+    description: 'General command for hideinfo plugin'
+    usage: '/hideinfo <option> [<toggle>]'
+    permission: hideinfo.*
