@@ -101,7 +101,8 @@ public final class HideInfo extends JavaPlugin implements Listener {
     @EventHandler
     public void onCommandPreProcess(PlayerCommandPreprocessEvent event) {
         String msg = event.getMessage().toLowerCase();
-        if (!config.getBoolean("secure") && msg.contains(":")) {
+        String[] args = msg.split(" ");
+        if (!config.getBoolean("secure") && args.length > 0 && args[0].contains(":")) {
             event.setCancelled(true);
         } else if (!config.getBoolean("vanilla") && msg.startsWith("/minecraft:")) {
             event.setCancelled(true);
