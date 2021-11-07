@@ -3,6 +3,7 @@ package ca.fxco.hideinfo;
 import ca.fxco.hideinfo.Commands.CommandHideInfo;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -69,16 +70,16 @@ public final class HideInfo extends JavaPlugin implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChat(PlayerChatEvent event) {
-        if (config.getBoolean("chat") || !event.getPlayer().isOp()) {
+        if (!config.getBoolean("chat") || !event.getPlayer().isOp()) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChatAsync(AsyncPlayerChatEvent event) {
-        if (config.getBoolean("chat") || !event.getPlayer().isOp()) {
+        if (!config.getBoolean("chat") || !event.getPlayer().isOp()) {
             event.setCancelled(true);
         }
     }
