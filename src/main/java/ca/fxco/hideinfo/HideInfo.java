@@ -1,6 +1,8 @@
 package ca.fxco.hideinfo;
 
 import ca.fxco.hideinfo.Commands.CommandHideInfo;
+import ca.fxco.hideinfo.ToggleActions.SpectatorToggleAction;
+import ca.fxco.hideinfo.Interfaces.ToggleAction;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,23 +18,25 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Set;
 
 public final class HideInfo extends JavaPlugin implements Listener {
 
-    //Plugin made for PhoenixSC & Shoezilla
+    //Plugin made for PhoenixSC & Shoezilla by FX - PR0CESS
 
     public LinkedHashMap<String, String> toggles = new LinkedHashMap<>();
+    public LinkedHashMap<String, ToggleAction> toggleActions = new LinkedHashMap<>();
     public FileConfiguration config = getConfig();
 
     public HideInfo() {
         super();
         initToggles();
+        initToggleActions();
     }
 
     protected HideInfo(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
         super(loader, description, dataFolder, file);
         initToggles();
+        initToggleActions();
     }
 
     public void initToggles() {
@@ -46,7 +50,12 @@ public final class HideInfo extends JavaPlugin implements Listener {
         toggles.put("vanilla", "Toggle /minecraft:<cmd>");
         toggles.put("secure", "Toggle /<namespace>:<cmd>");
         toggles.put("pinglist", "Toggle seeing player list in ping");
+        toggles.put("spectator", "Toggle spectators seeing other spectators");
         toggles.put("help", "Toggle /help");
+    }
+
+    public void initToggleActions() {
+        toggleActions.put("spectator", new SpectatorToggleAction());
     }
 
     @Override
@@ -73,6 +82,9 @@ public final class HideInfo extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!config.getBoolean("join")) {
             event.setJoinMessage("");
+        }
+        if (!config.getBoolean("spectator")) {
+            SpectatorToggleAction.setVisibility(this, event.getPlayer(), event.getPlayer().getGameMode());
         }
     }
 
@@ -121,12 +133,19 @@ public final class HideInfo extends JavaPlugin implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void ping(@NonNull ServerListPingEvent event) {
+    public void onPing(@NonNull ServerListPingEvent event) {
         if (!config.getBoolean("pinglist")) {
             try {
                 final Iterator<Player> players = event.iterator();
                 while (players.hasNext()) {players.remove();}
             } catch (final UnsupportedOperationException ignored) {}
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onGameModeChange(PlayerGameModeChangeEvent event) {
+        if (!config.getBoolean("spectator")) {
+            SpectatorToggleAction.setVisibility(this, event.getPlayer(), event.getNewGameMode());
         }
     }
 }

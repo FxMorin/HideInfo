@@ -35,15 +35,24 @@ public class CommandHideInfo implements CommandExecutor {
                 if (args[0].equalsIgnoreCase("help")) {
                     sendHelpMenu(sender);
                 } else {
-                    if (this.hideInfo.toggles.containsKey(args[0].toLowerCase())) {
-                        String value = args[0].toLowerCase();
+                    String value = args[0].toLowerCase();
+                    if (this.hideInfo.toggles.containsKey(value)) {
+                        boolean newValue;
                         if (args.length == 2) {
-                            this.hideInfo.config.set(value, args[1].equalsIgnoreCase("true"));
+                            newValue = args[1].equalsIgnoreCase("true");
                         } else {
-                            this.hideInfo.config.set(value, !this.hideInfo.config.getBoolean(value));
+                            newValue = !this.hideInfo.config.getBoolean(value);
                         }
+                        this.hideInfo.config.set(value, newValue);
                         this.hideInfo.onModifyConfig();
                         sender.sendMessage(PREFIX + "§9" + value + "§f is now: " + (this.hideInfo.config.getBoolean(value) ? "§2Showing" : "§4Hiding"));
+                        if (this.hideInfo.toggleActions.containsKey(value)) {
+                            if (newValue) {
+                                this.hideInfo.toggleActions.get(value).enable(this.hideInfo,sender.getServer());
+                            } else {
+                                this.hideInfo.toggleActions.get(value).enable(this.hideInfo,sender.getServer());
+                            }
+                        }
                     } else {
                         sender.sendMessage(PREFIX + "§9" + args[0] + "§f is not a valid option!");
                     }
