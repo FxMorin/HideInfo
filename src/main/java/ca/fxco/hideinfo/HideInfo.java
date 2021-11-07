@@ -63,7 +63,7 @@ public final class HideInfo extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {}
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!config.getBoolean("join")) {
             event.setJoinMessage("");
@@ -72,51 +72,45 @@ public final class HideInfo extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChat(PlayerChatEvent event) {
-        if (!config.getBoolean("chat") || !event.getPlayer().isOp()) {
+        if (!config.getBoolean("chat") && !event.getPlayer().isOp()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChatAsync(AsyncPlayerChatEvent event) {
-        if (!config.getBoolean("chat") || !event.getPlayer().isOp()) {
+        if (!config.getBoolean("chat") && !event.getPlayer().isOp()) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler
-    public void onPlayerChatTab(PlayerChatTabCompleteEvent event) {
-        if (event.getPlayer().isOp() && event.getChatMessage().startsWith("/hideinfo")) {
-            event.getTabCompletions().clear();
-            event.getTabCompletions().addAll(toggles.keySet());
-        }
-    }
-
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent event) {
         if (!config.getBoolean("leave")) {
             event.setQuitMessage("");
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCommandPreProcess(PlayerCommandPreprocessEvent event) {
-        String msg = event.getMessage().toLowerCase();
-        String[] args = msg.split(" ");
-        if (!config.getBoolean("secure") && args.length > 0 && args[0].contains(":")) {
-            event.setCancelled(true);
-        } else if (!config.getBoolean("vanilla") && msg.startsWith("/minecraft:")) {
-            event.setCancelled(true);
-        } else if (!config.getBoolean("msg") && (msg.startsWith("/tell") || msg.startsWith("/msg") || msg.startsWith("/w"))) {
-            event.setCancelled(true);
-        } else if (!config.getBoolean("me") && msg.startsWith("/me")) {
-            event.setCancelled(true);
-        } else if (!config.getBoolean("teammsg") && (msg.startsWith("/teammsg") || msg.startsWith("/tm"))) {
-            event.setCancelled(true);
-        } else if (!config.getBoolean("plugins") && (msg.startsWith("/plugins") || msg.startsWith("/pl") || msg.startsWith("/?"))) {
-            event.setCancelled(true);
-        } else if (!config.getBoolean("help") && msg.startsWith("/help")) {
-            event.setCancelled(true);
+        if (!event.getPlayer().isOp()) {
+            String msg = event.getMessage().toLowerCase();
+            String[] args = msg.split(" ");
+            if (!config.getBoolean("secure") && args.length > 0 && args[0].contains(":")) {
+                event.setCancelled(true);
+            } else if (!config.getBoolean("vanilla") && msg.startsWith("/minecraft:")) {
+                event.setCancelled(true);
+            } else if (!config.getBoolean("msg") && (msg.startsWith("/tell") || msg.startsWith("/msg") || msg.startsWith("/w"))) {
+                event.setCancelled(true);
+            } else if (!config.getBoolean("me") && msg.startsWith("/me")) {
+                event.setCancelled(true);
+            } else if (!config.getBoolean("teammsg") && (msg.startsWith("/teammsg") || msg.startsWith("/tm"))) {
+                event.setCancelled(true);
+            } else if (!config.getBoolean("plugins") && (msg.startsWith("/plugins") || msg.startsWith("/pl") || msg.startsWith("/?"))) {
+                event.setCancelled(true);
+            } else if (!config.getBoolean("help") && msg.startsWith("/help")) {
+                event.setCancelled(true);
+            }
         }
     }
 }
