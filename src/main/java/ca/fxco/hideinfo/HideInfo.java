@@ -2,16 +2,21 @@ package ca.fxco.hideinfo;
 
 import ca.fxco.hideinfo.Commands.CommandHideInfo;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public final class HideInfo extends JavaPlugin implements Listener {
 
@@ -40,6 +45,7 @@ public final class HideInfo extends JavaPlugin implements Listener {
         toggles.put("plugins", "Toggle /plugins, /pl, & /?");
         toggles.put("vanilla", "Toggle /minecraft:<cmd>");
         toggles.put("secure", "Toggle /<namespace>:<cmd>");
+        toggles.put("pinglist", "Toggle seeing player list in ping");
         toggles.put("help", "Toggle /help");
     }
 
@@ -111,6 +117,16 @@ public final class HideInfo extends JavaPlugin implements Listener {
             } else if (!config.getBoolean("help") && msg.startsWith("/help")) {
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void ping(@NonNull ServerListPingEvent event) {
+        if (!config.getBoolean("pinglist")) {
+            try {
+                final Iterator<Player> players = event.iterator();
+                while (players.hasNext()) {players.remove();}
+            } catch (final UnsupportedOperationException ignored) {}
         }
     }
 }
